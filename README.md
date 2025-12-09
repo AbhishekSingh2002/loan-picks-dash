@@ -357,5 +357,4 @@ MIT License - see LICENSE file for details
 
 ## 📧 Support
 
-For issues or questions, please open a GitHub issue or contact support@example.com#   l o a n - p i c k s  
- 
+For issues or questions, please open a GitHub issue or contact support@example.com#
