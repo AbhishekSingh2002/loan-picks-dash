@@ -1,0 +1,552 @@
+/* =============================================================================
+   WHY: Complete CSS styles for Loan Picks Dashboard
+   Includes Tailwind base, custom utilities, and component-specific styles
+   ============================================================================= */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =============================================================================
+   WHY: CSS Custom Properties for theme colors (shadcn/ui integration)
+   Allows easy theme switching and consistent color usage
+   ============================================================================= */
+
+@layer base {
+  :root {
+    /* Background colors */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    
+    /* Card colors */
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    
+    /* Popover colors */
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    
+    /* Primary colors (Blue) */
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    
+    /* Secondary colors */
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    
+    /* Muted colors */
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    
+    /* Accent colors */
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    
+    /* Destructive colors (Red) */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    
+    /* Border and input */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    
+    /* Border radius */
+    --radius: 0.5rem;
+  }
+
+  /* WHY: Dark mode theme support */
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+}
+
+/* =============================================================================
+   WHY: Base styles for consistent appearance
+   ============================================================================= */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* WHY: Smooth scrolling for anchor links */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* WHY: Better focus indicators for accessibility */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2;
+  }
+
+  /* WHY: Consistent heading styles */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+  }
+
+  h1 {
+    @apply text-3xl;
+  }
+
+  h2 {
+    @apply text-2xl;
+  }
+
+  h3 {
+    @apply text-xl;
+  }
+}
+
+/* =============================================================================
+   WHY: Badge variant styles (used in ProductCard)
+   ============================================================================= */
+
+@layer components {
+  /* Success badge (Low APR) */
+  .badge-success {
+    @apply bg-green-100 text-green-800 border-green-300;
+  }
+
+  /* Info badge (No Prepayment) */
+  .badge-info {
+    @apply bg-blue-100 text-blue-800 border-blue-300;
+  }
+
+  /* Warning badge (Fast Disbursal) */
+  .badge-warning {
+    @apply bg-orange-100 text-orange-800 border-orange-300;
+  }
+
+  /* Default badge */
+  .badge-default {
+    @apply bg-gray-100 text-gray-800 border-gray-300;
+  }
+
+  /* Secondary badge */
+  .badge-secondary {
+    @apply bg-purple-100 text-purple-800 border-purple-300;
+  }
+}
+
+/* =============================================================================
+   WHY: Card component styles
+   ============================================================================= */
+
+@layer components {
+  .card {
+    @apply rounded-lg border bg-card text-card-foreground shadow-sm;
+  }
+
+  .card-header {
+    @apply flex flex-col space-y-1.5 p-6;
+  }
+
+  .card-title {
+    @apply text-2xl font-semibold leading-none tracking-tight;
+  }
+
+  .card-description {
+    @apply text-sm text-muted-foreground;
+  }
+
+  .card-content {
+    @apply p-6 pt-0;
+  }
+
+  /* WHY: Best match card special styling */
+  .card-best-match {
+    @apply border-2 border-blue-500 shadow-lg;
+  }
+}
+
+/* =============================================================================
+   WHY: Button component styles
+   ============================================================================= */
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+    @apply disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-default {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+  }
+
+  .btn-outline {
+    @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground;
+  }
+
+  .btn-ghost {
+    @apply hover:bg-accent hover:text-accent-foreground;
+  }
+
+  .btn-sm {
+    @apply h-9 rounded-md px-3;
+  }
+
+  .btn-lg {
+    @apply h-11 rounded-md px-8;
+  }
+
+  .btn-icon {
+    @apply h-10 w-10;
+  }
+}
+
+/* =============================================================================
+   WHY: Sheet/Dialog overlay styles (for ChatSheet)
+   ============================================================================= */
+
+@layer components {
+  .sheet-overlay {
+    @apply fixed inset-0 z-50 bg-background/80 backdrop-blur-sm;
+    @apply data-[state=open]:animate-in data-[state=closed]:animate-out;
+    @apply data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0;
+  }
+
+  .sheet-content {
+    @apply fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out;
+    @apply data-[state=open]:animate-in data-[state=closed]:animate-out;
+    @apply data-[state=closed]:duration-300 data-[state=open]:duration-500;
+  }
+
+  .sheet-content-right {
+    @apply inset-y-0 right-0 h-full w-3/4 border-l;
+    @apply data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right;
+    @apply sm:max-w-lg;
+  }
+}
+
+/* =============================================================================
+   WHY: Chat message styles
+   ============================================================================= */
+
+@layer components {
+  .chat-message {
+    @apply max-w-[80%] rounded-lg px-4 py-2;
+  }
+
+  .chat-message-user {
+    @apply bg-blue-500 text-white;
+  }
+
+  .chat-message-assistant {
+    @apply bg-gray-100 text-gray-900;
+  }
+
+  .chat-input {
+    @apply flex-1 px-4 py-2 border rounded-lg;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500;
+  }
+}
+
+/* =============================================================================
+   WHY: Custom utility classes
+   ============================================================================= */
+
+@layer utilities {
+  /* WHY: Screen reader only class (accessibility) */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* WHY: Reverse sr-only when focused (for skip links) */
+  .focus\:not-sr-only:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: inherit;
+    margin: inherit;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  /* WHY: Text truncation utilities */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* WHY: Gradient backgrounds */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .bg-gradient-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  }
+
+  .bg-gradient-blue {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  }
+}
+
+/* =============================================================================
+   WHY: Loading animations
+   ============================================================================= */
+
+@layer utilities {
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.5) 50%,
+      transparent 100%
+    );
+    background-size: 1000px 100%;
+  }
+
+  /* WHY: Bounce animation for chat loading dots */
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-0.5rem);
+    }
+  }
+
+  .animate-bounce {
+    animation: bounce 1s infinite;
+  }
+
+  /* WHY: Pulse animation for loading states */
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* WHY: Slide in/out animations for Sheet */
+  @keyframes slideInFromRight {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideOutToRight {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  .slide-in-from-right {
+    animation: slideInFromRight 0.3s ease-out;
+  }
+
+  .slide-out-to-right {
+    animation: slideOutToRight 0.3s ease-in;
+  }
+}
+
+/* =============================================================================
+   WHY: Custom scrollbar styling for better UX
+   ============================================================================= */
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+}
+
+/* =============================================================================
+   WHY: Responsive utilities
+   ============================================================================= */
+
+@layer utilities {
+  /* Container max-widths */
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      max-width: 640px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .container {
+      max-width: 768px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      max-width: 1024px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .container {
+      max-width: 1280px;
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .container {
+      max-width: 1536px;
+    }
+  }
+}
+
+/* =============================================================================
+   WHY: Badge hover effects
+   ============================================================================= */
+
+@layer components {
+  .badge {
+    @apply inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold;
+    @apply transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  }
+
+  .badge:hover {
+    @apply opacity-90;
+  }
+}
+
+/* =============================================================================
+   WHY: Product card hover effects
+   ============================================================================= */
+
+@layer components {
+  .product-card {
+    @apply transition-all duration-200;
+  }
+
+  .product-card:hover {
+    @apply shadow-lg transform -translate-y-1;
+  }
+}
+
+/* =============================================================================
+   WHY: Header styles
+   ============================================================================= */
+
+@layer components {
+  .header {
+    @apply bg-white border-b shadow-sm sticky top-0 z-50;
+  }
+
+  .header-container {
+    @apply container mx-auto px-4 py-4;
+  }
+}
+
+/* =============================================================================
+   WHY: Print styles (bonus - for generating reports)
+   ============================================================================= */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  .card {
+    page-break-inside: avoid;
+  }
+}
