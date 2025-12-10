@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { X, Send, Loader2 } from 'lucide-react';
-import { simulateAIResponse } from '@/lib/ai';
 import type { Product, ChatMessage as ChatMessageType } from '@/types';
 
 interface ChatSheetProps {
@@ -76,28 +75,27 @@ export function ChatSheet({ product, isOpen, onClose }: ChatSheetProps) {
     setIsLoading(true);
 
     try {
-      // WHY: In production, this would be:
-      // const response = await fetch('/api/ai/ask', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     productId: product.id,
-      //     message: input,
-      //     history: messages.map(m => ({ role: m.role, content: m.content }))
-      //   })
-      // });
-      // const data = await response.json();
-      // const assistantMessage = data.message;
+      // WHY: Call real API route which handles grounding + persistence
+      const response = await fetch('/api/ai/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: product.id,
+          message: userMessage.content,
+          history: messages.map(m => ({ role: m.role, content: m.content }))
+        })
+      });
 
-      // WHY: Simulate network delay for realistic UX
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const data: { success: boolean; message?: string; error?: string } = await response.json();
 
-      const aiResponse = simulateAIResponse(product, input);
+      if (!response.ok || !data.success || !data.message) {
+        throw new Error(data.error || 'Failed to get AI response');
+      }
 
       const assistantMessage: ChatMessageType = {
         product_id: product.id,
         role: 'assistant',
-        content: aiResponse,
+        content: data.message,
         created_at: new Date()
       };
 

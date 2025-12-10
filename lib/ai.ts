@@ -6,6 +6,17 @@
 
 import type { Product } from '@/types';
 
+function formatCurrencyINR(amount: number | null | undefined): string {
+  if (amount === null || amount === undefined || Number.isNaN(amount as number)) {
+    return 'Not specified';
+  }
+  try {
+    return `₹${(amount as number).toLocaleString('en-IN')}`;
+  } catch {
+    return `₹${amount}`;
+  }
+}
+
 // =============================================================================
 // WHY: Build grounded prompt with strict instructions
 // System message explicitly tells LLM to:
@@ -27,7 +38,7 @@ PRODUCT INFORMATION:
 - Bank: ${product.bank}
 - Loan Type: ${product.type}
 - Interest Rate (APR): ${product.rate_apr}%
-- Minimum Income Required: ₹${product.min_income.toLocaleString('en-IN')} per month
+- Minimum Income Required: ${formatCurrencyINR(product.min_income)} per month
 - Minimum Credit Score: ${product.min_credit_score}
 - Tenure Range: ${product.tenure_min_months} to ${product.tenure_max_months} months
 ${product.processing_fee_pct ? `- Processing Fee: ${product.processing_fee_pct}%` : ''}
@@ -98,7 +109,7 @@ export function simulateAIResponse(
   }
 
   if (q.includes('eligible') || q.includes('qualify') || q.includes('requirement')) {
-    return `To qualify for the ${product.name}, you need:\n- Minimum credit score: ${product.min_credit_score}\n- Minimum monthly income: ₹${product.min_income.toLocaleString('en-IN')}\n- The loan tenure ranges from ${product.tenure_min_months} to ${product.tenure_max_months} months.`;
+    return `To qualify for the ${product.name}, you need:\n- Minimum credit score: ${product.min_credit_score}\n- Minimum monthly income: ${formatCurrencyINR(product.min_income)}\n- The loan tenure ranges from ${product.tenure_min_months} to ${product.tenure_max_months} months.`;
   }
 
   if (q.includes('prepayment') || q.includes('penalty') || q.includes('early')) {
@@ -138,7 +149,7 @@ export function simulateAIResponse(
 
   // WHY: Safe fallback when question is outside available data
   // This demonstrates the "fail-safe behavior" requirement
-  return `I don't have specific information about that in our product database. However, I can help you with details about the ${product.name}'s:\n- Interest rate (${product.rate_apr}% APR)\n- Eligibility criteria (credit score: ${product.min_credit_score}, income: ₹${product.min_income.toLocaleString('en-IN')})\n- Tenure options (${product.tenure_min_months}-${product.tenure_max_months} months)\n- Prepayment terms${product.disbursal_speed ? '\n- Disbursal timeline' : ''}\n\nWhat would you like to know about these aspects?`;
+  return `I don't have specific information about that in our product database. However, I can help you with details about the ${product.name}'s:\n- Interest rate (${product.rate_apr}% APR)\n- Eligibility criteria (credit score: ${product.min_credit_score}, income: ${formatCurrencyINR(product.min_income)})\n- Tenure options (${product.tenure_min_months}-${product.tenure_max_months} months)\n- Prepayment terms${product.disbursal_speed ? '\n- Disbursal timeline' : ''}\n\nWhat would you like to know about these aspects?`;
 }
 
 // =============================================================================
@@ -146,31 +157,82 @@ export function simulateAIResponse(
 // This would be used in production /api/ai/ask route handler
 // =============================================================================
 
-export async function callLLMAPI(): Promise<string> {
-  // WHY: Production implementation would call actual LLM
-  // Example for OpenAI:
-  /*
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
+export async function callLLMAPI(prompt: string): Promise<string> {
+  // WHY: Prefer OpenAI if configured, otherwise fall back to Gemini
+  const openaiKey = process.env.OPENAI_API_KEY;
+  const geminiKey = process.env.GEMINI_API_KEY;
+
+  if (!openaiKey && !geminiKey) {
+    throw new Error('LLM API not configured. Set OPENAI_API_KEY or GEMINI_API_KEY.');
+  }
+
+  // WHY: Call OpenAI Chat Completions API when OPENAI_API_KEY is available
+  if (openaiKey) {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${openaiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: prompt },
+        ],
+        temperature: 0.4,
+        max_tokens: 500,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`OpenAI API error: ${response.status} ${errorText}`);
+    }
+
+    const data: any = await response.json();
+    const messageContent = data?.choices?.[0]?.message?.content;
+    if (!messageContent || typeof messageContent !== 'string') {
+      throw new Error('OpenAI API returned an unexpected response shape.');
+    }
+    return messageContent;
+  }
+
+  // WHY: Fallback to Gemini when OpenAI is not configured
+  const response = await fetch(
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': geminiKey as string,
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: prompt }],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.4,
+          maxOutputTokens: 500,
+        },
+      }),
     },
-    body: JSON.stringify({
-      model: 'gpt-4',
-      messages: [
-        { role: 'system', content: prompt }
-      ],
-      temperature: 0.7,
-      max_tokens: 500
-    })
-  });
-  
-  const data = await response.json();
-  return data.choices[0].message.content;
-  */
-  
-  throw new Error('LLM API not configured. Use simulateAIResponse for demo.');
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Gemini API error: ${response.status} ${errorText}`);
+  }
+
+  const data: any = await response.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text || typeof text !== 'string') {
+    throw new Error('Gemini API returned an unexpected response shape.');
+  }
+
+  return text;
 }
 
 // =============================================================================

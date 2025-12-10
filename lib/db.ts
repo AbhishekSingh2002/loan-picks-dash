@@ -7,6 +7,7 @@
 
 import { prisma } from '@/lib/prisma';
 import type { Product, ChatMessage, ProductFilters, LoanType, ProductFaq, ChatRole } from '@/types';
+import { LoanType as PrismaLoanType } from '@prisma/client';
 
 // =============================================================================
 // WHY: Get top products for user (personalized recommendations)
@@ -80,7 +81,16 @@ export async function getProducts(filters: ProductFilters): Promise<{
   }
 
   if (filters.type) {
-    where.type = filters.type;
+    const typeMap: Record<LoanType, PrismaLoanType> = {
+      personal: PrismaLoanType.PERSONAL,
+      education: PrismaLoanType.EDUCATION,
+      home: PrismaLoanType.HOME,
+      vehicle: PrismaLoanType.VEHICLE,
+      credit_line: PrismaLoanType.CREDIT_LINE,
+      debt_consolidation: PrismaLoanType.DEBT_CONSOLIDATION,
+    };
+
+    where.type = typeMap[filters.type];
   }
 
   if (filters.apr_min !== undefined) {

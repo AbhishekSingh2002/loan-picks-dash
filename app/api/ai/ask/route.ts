@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AIAskSchema } from '@/lib/validators/schemas';
 import { getProductById, saveChatMessage } from '@/lib/db';
-import { simulateAIResponse, validateAIResponse } from '@/lib/ai';
+import { buildGroundedPrompt, callLLMAPI, simulateAIResponse, validateAIResponse } from '@/lib/ai';
 import { authOptions } from '@/auth';
 import { getServerSession } from 'next-auth';
 
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = AIAskSchema.parse(body);
 
-    const { productId, message } = validatedData;
+    const { productId, message, history } = validatedData;
 
     // WHY: Get user ID from auth session
     const session = await getServerSession(authOptions);
@@ -69,15 +69,28 @@ export async function POST(request: NextRequest) {
 
     // ==========================================================================
     // WHY: Build grounded prompt using lib/ai.ts
-    // Prompt explicitly tells LLM:
-    // WHY: Call LLM API (OpenAI/Gemini) with grounded prompt
-    // In production, this would use actual API:
-    // const aiResponse = await callLLMAPI(groundedPrompt, process.env.OPENAI_API_KEY);
-    // 
-    // For demo without API keys, using simulation
+    // Prompt explicitly tells LLM to only use product data and follow safety rules
     // ==========================================================================
 
-    const aiResponse = simulateAIResponse(product, message);
+    const groundedPrompt = buildGroundedPrompt(
+      product,
+      message,
+      history ?? [],
+    );
+
+    let aiResponse: string;
+
+    try {
+      // ========================================================================
+      // WHY: Call LLM API (OpenAI/Gemini) with grounded prompt when configured
+      // If LLM is not configured or fails, gracefully fall back to simulation
+      // ========================================================================
+
+      aiResponse = await callLLMAPI(groundedPrompt);
+    } catch (llmError) {
+      console.warn('LLM API not configured or failed, falling back to simulation:', llmError);
+      aiResponse = simulateAIResponse(product, message);
+    }
 
     // ==========================================================================
     // WHY: Validate AI response doesn't contain hallucinated claims
