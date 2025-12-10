@@ -266,18 +266,4 @@ export async function GET(request: NextRequest) {
   return handleGetCurrentUser(request);
 }
 
-// =============================================================================
-// WHY: Utility function to verify auth token (used in other API routes)
-// =============================================================================
-
-export function verifyAuthToken(token: string): { userId: string; email: string } | null {
-  try {
-    const decoded = verify(token, JWT_SECRET) as any;
-    return {
-      userId: decoded.userId,
-      email: decoded.email
-    };
-  } catch {
-    return null;
-  }
-}
+// Moved to lib/auth-utils.ts
