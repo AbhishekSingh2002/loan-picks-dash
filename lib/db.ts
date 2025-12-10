@@ -58,7 +58,31 @@ export async function getProductById(id: string): Promise<Product | null> {
     where: { id },
   });
 
-  return product as Product | null;
+  if (!product) {
+    return null;
+  }
+
+  return {
+    id: product.id,
+    name: product.name,
+    bank: product.bank,
+    type: product.type.toLowerCase() as LoanType,
+    rate_apr: product.rateApr,
+    min_income: product.minIncome,
+    min_credit_score: product.minCreditScore,
+    tenure_min_months: product.tenureMinMonths,
+    tenure_max_months: product.tenureMaxMonths,
+    processing_fee_pct: product.processingFeePct || undefined,
+    prepayment_allowed: product.prepaymentAllowed,
+    disbursal_speed: product.disbursalSpeed || undefined,
+    docs_level: product.docsLevel || undefined,
+    summary: product.summary || undefined,
+    faq: (product.faq as unknown as ProductFaq[]) || undefined,
+    terms: (product.terms as unknown as Record<string, unknown>) || undefined,
+    matchScore: product.matchScore || undefined,
+    created_at: product.createdAt,
+    updated_at: product.updatedAt,
+  };
 }
 
 // =============================================================================

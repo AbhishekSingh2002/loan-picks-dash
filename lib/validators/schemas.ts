@@ -76,7 +76,7 @@ export const ProductFiltersSchema = z.object({
   apr_min: z.number().positive().optional(),
   apr_max: z.number().positive().optional(),
   min_income: z.number().int().positive().optional(),
-  min_credit_score: z.number().int().min(300).max(900).optional(),
+  min_credit_score: z.number().int().positive().optional(),
   limit: z.number().int().positive().max(100).default(10),
   offset: z.number().int().min(0).default(0)
 });

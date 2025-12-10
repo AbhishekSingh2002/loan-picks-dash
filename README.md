@@ -2,6 +2,36 @@
 
 AI-powered personalized loan recommendation platform with real-time chat assistance.
 
+## ⚙️ Tech Stack
+
+### Core
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript 5
+- **Runtime**: React 18
+
+### UI & Styling
+- Tailwind CSS 3
+- tailwindcss-animate
+- Radix UI (Dialog, Label, Slot)
+- Lucide React (icons)
+
+### Auth & Security
+- NextAuth.js
+- Prisma Auth adapters (`@auth/prisma-adapter`, `@next-auth/prisma-adapter`)
+- JSON Web Tokens (`jsonwebtoken`)
+- Password hashing with `bcryptjs`
+
+### Database
+- PostgreSQL
+- Prisma ORM (`@prisma/client`, `prisma`)
+
+### Validation & Utilities
+- Zod (schema validation)
+- class-variance-authority
+- clsx
+- tailwind-merge
+
+
 ## 🏗️ Architecture Overview
 
 ```
@@ -280,81 +310,8 @@ function getBadges(product: Product): Badge[] {
 - `products(min_credit_score)` - Credit score queries
 - `chat_messages(product_id, user_id, created_at)` - Chat history
 
-## 🧪 Testing
-
-```bash
-# Run type checking
-pnpm tsc --noEmit
-
-# Run linting
-pnpm lint
-
-# Run unit tests (badge logic, validation)
-pnpm test
-
-# Run E2E tests
-pnpm test:e2e
-```
-
-## 📦 Deployment
-
-### Vercel (Recommended)
-
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel
-
-# Set environment variables in Vercel dashboard
-```
-
 ### Environment Variables (Production)
 - `DATABASE_URL`: Supabase Postgres connection string
 - `OPENAI_API_KEY`: For AI chat
 - `NEXTAUTH_SECRET`: Generate with `openssl rand -base64 32`
 - `NEXTAUTH_URL`: Your production domain
-
-## 📈 Performance
-
-- **Initial Load**: < 2s (server-side rendering)
-- **Time to Interactive**: < 3s
-- **First Contentful Paint**: < 1s
-- **Chat Response**: < 2s (with LLM API)
-
-### Optimizations
-- Server Components (Next.js App Router)
-- Database indexes on filtered columns
-- Pagination (10 products per page)
-- Image optimization (next/image)
-- Code splitting (dynamic imports)
-
-## 🎓 Evaluation Criteria Coverage
-
-| Criterion | Score | Implementation |
-|-----------|-------|----------------|
-| **UI/UX & Accessibility** | 25/25 | ARIA labels, semantic HTML, keyboard nav, focus management, color contrast, screen reader support |
-| **Frontend Architecture** | 20/20 | Clean separation (components, lib, types), reusable components, pure functions for badges |
-| **TypeScript & Validation** | 20/20 | No `any` types, strict interfaces, Zod schemas for runtime validation |
-| **AI Chat Integration** | 15/15 | Server-side grounding, product data only, safe fallbacks, cite fields, persistent history |
-| **Sharing & Persistence** | 10/10 | PostgreSQL with Prisma, indexed queries, seeded data, message persistence |
-| **Responsive** | 10/10 | Mobile-first grid, responsive Sheet/Drawer, breakpoints |
-
-**Total**: 100/100
-
-## 🤝 Contributing
-
-1. Fork repository
-2. Create feature branch (`git checkout -b feature/amazing`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing`)
-5. Open Pull Request
-
-## 📝 License
-
-MIT License - see LICENSE file for details
-
-## 📧 Support
-
-For issues or questions, please open a GitHub issue or contact support@example.com#

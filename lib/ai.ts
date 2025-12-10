@@ -100,6 +100,20 @@ export function simulateAIResponse(
   // In production, LLM would handle this more naturally
   // But this demonstrates the "only use product data" constraint
 
+  // Handle simple greetings in a more chatbot-like way
+  if (/^\s*(hi|hii|hello|hey|hola)\b/.test(q)) {
+    return `Hi there! I'm your loan assistant for the ${product.name} from ${product.bank}.
+
+I can help you understand:
+- The interest rate (${product.rate_apr}% APR)
+- Who is eligible (credit score ${product.min_credit_score}, income ${formatCurrencyINR(product.min_income)})
+- Tenure options (${product.tenure_min_months}-${product.tenure_max_months} months)
+- Fees like processing charges${product.disbursal_speed ? `
+- How fast the loan is disbursed (${product.disbursal_speed} disbursal)` : ''}
+
+What would you like to know about this loan?`;
+  }
+
   if (q.includes('apr') || q.includes('interest') || q.includes('rate')) {
     return `The ${product.name} has an annual percentage rate (APR) of ${product.rate_apr}%. ${
       product.rate_apr <= 9.5 

@@ -4,7 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { BestMatchCard } from '@/components/cards/BestMatchCard';
 import { ProductCard } from '@/components/cards/ProductCard';
 import { ChatSheet } from '@/components/ui/ChatSheet';
-import { Header } from '@/components/layout/Header';
+import AuthHeader from '@/components/layout/AuthHeader';
+
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -147,7 +148,8 @@ export default function DashboardPage(): React.ReactElement {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-        <Header />
+        <AuthHeader />
+
         <main className="container mx-auto px-4 py-8">
           <div className="space-y-8">
             {/* Best Match Skeleton */}
@@ -185,7 +187,8 @@ export default function DashboardPage(): React.ReactElement {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <Header />
+      <AuthHeader />
+
       
       <main className="container mx-auto px-4 py-8" id="main-content">
         {/* Error State */}

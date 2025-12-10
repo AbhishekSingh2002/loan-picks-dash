@@ -10,6 +10,7 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { getTopProductsForUser } from '@/lib/db';
 import DashboardContent from '@/components/dashboard/DashboardContent';
+import AuthHeader from '@/components/layout/AuthHeader';
 import { Loader2 } from 'lucide-react';
 
 // =============================================================================
@@ -30,7 +31,9 @@ export default async function DashboardPage() {
   const topProducts = await getTopProductsForUser(5);
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
+    <>
+      <AuthHeader />
+      <div className="container mx-auto p-6 space-y-8">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Your Top Loan Matches</h1>
@@ -51,5 +54,6 @@ export default async function DashboardPage() {
         <DashboardContent products={topProducts} />
       </Suspense>
     </div>
+    </>
   );
 }
